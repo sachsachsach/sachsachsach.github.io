@@ -30,8 +30,12 @@
           var tapTimeDifference = currentTime - lastTapTime;
 
           if (tapTimeDifference <= doubleTapDelay) {
-            // Double tap detected, reset the cell
-            resetCell(this);
+            // Double tap detected, reset or make editable based on column index
+            if (this.cellIndex === 0) {
+              makeEditable(this);
+            } else {
+              resetCell(this);
+            }
           } else {
             // Single tap detected, toggle class
             toggleClass(this);
@@ -69,6 +73,11 @@
 
       // Update drop-down menus in the row to have the default value ""
       updateDropdowns(row);
+    }
+
+    function makeEditable(cell) {
+      // Set contenteditable to true for cells in column 1
+      cell.setAttribute('contenteditable', 'true');
     }
 
     function updateDropdowns(row) {
