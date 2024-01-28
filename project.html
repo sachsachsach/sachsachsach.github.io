@@ -22,30 +22,27 @@
         var cellId = 'cell_1_' + i;
         var cell = document.getElementById(cellId);
 
-        // Add both 'contextmenu' and 'longpress' event listeners
-        cell.addEventListener('contextmenu', function (event) {
-          event.preventDefault();
-          handleCellClick(this);
-        });
+        var lastTapTime = 0;
+        var doubleTapDelay = 300; // Adjust this value as needed
 
-        cell.addEventListener('touchstart', function (event) {
-          // Prevent the default touch behavior (e.g., scrolling)
-          event.preventDefault();
+        cell.addEventListener('click', function (event) {
+          var currentTime = new Date().getTime();
+          var tapTimeDifference = currentTime - lastTapTime;
 
-          // Set a timeout for the long-press (adjust the duration as needed)
-          this.longPressTimeout = setTimeout(function () {
-            handleCellClick(this);
-          }.bind(this), 500);
-        });
+          if (tapTimeDifference <= doubleTapDelay) {
+            // Double tap detected, reset the cell
+            resetCell(this);
+          } else {
+            // Single tap detected, toggle class
+            toggleClass(this);
+          }
 
-        cell.addEventListener('touchend', function () {
-          // Clear the timeout when touch is released before the long-press duration
-          clearTimeout(this.longPressTimeout);
+          lastTapTime = currentTime;
         });
       }
     });
 
-    function handleCellClick(cell) {
+    function toggleClass(cell) {
       // Toggle 'crossed-out' class on the clicked cell
       cell.classList.toggle('crossed-out');
 
@@ -55,6 +52,22 @@
       row.classList.toggle('crossed-row');
 
       // Update drop-down menus in the row to have the default value "X" if the row is crossed out
+      updateDropdowns(row);
+    }
+
+    function resetCell(cell) {
+      // Reset the cell to its default state
+      cell.classList.remove('crossed-out');
+
+      // Get the row ID and remove 'crossed-row' class for the entire row
+      var rowId = cell.id.split('_')[2];
+      var row = document.getElementById('row_' + rowId);
+      row.classList.remove('crossed-row');
+
+      // Set contenteditable to false during the reset
+      cell.setAttribute('contenteditable', 'false');
+
+      // Update drop-down menus in the row to have the default value ""
       updateDropdowns(row);
     }
 
