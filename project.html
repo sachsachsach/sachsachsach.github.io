@@ -22,26 +22,24 @@
         var cellId = 'cell_1_' + i;
         var cell = document.getElementById(cellId);
 
-        var lastTapTime = 0;
-        var doubleTapDelay = 300; // Adjust this value as needed
+        var longPressTimer;
 
-        cell.addEventListener('click', function (event) {
-          var currentTime = new Date().getTime();
-          var tapTimeDifference = currentTime - lastTapTime;
+        cell.addEventListener('touchstart', function (event) {
+          // Prevent the default touch behavior (e.g., scrolling)
+          event.preventDefault();
 
-          if (tapTimeDifference <= doubleTapDelay) {
-            // Double tap detected, reset or make editable based on column index
-            if (this.cellIndex === 0) {
-              makeEditable(this);
-            } else {
-              resetCell(this);
-            }
-          } else {
-            // Single tap detected, toggle class
-            toggleClass(this);
-          }
+          // Set a timeout for the long-press (adjust the duration as needed)
+          longPressTimer = setTimeout(function () {
+            makeEditable(this);
+          }.bind(this), 500);
+        });
 
-          lastTapTime = currentTime;
+        cell.addEventListener('touchend', function () {
+          // Clear the timeout when touch is released before the long-press duration
+          clearTimeout(longPressTimer);
+
+          // Single tap detected, toggle class
+          toggleClass(this);
         });
       }
     });
@@ -59,6 +57,13 @@
       updateDropdowns(row);
     }
 
+    function makeEditable(cell) {
+      // Set contenteditable to true for cells in column 1
+      if (cell.cellIndex === 0) {
+        cell.setAttribute('contenteditable', 'true');
+      }
+    }
+
     function resetCell(cell) {
       // Reset the cell to its default state
       cell.classList.remove('crossed-out');
@@ -73,11 +78,6 @@
 
       // Update drop-down menus in the row to have the default value ""
       updateDropdowns(row);
-    }
-
-    function makeEditable(cell) {
-      // Set contenteditable to true for cells in column 1
-      cell.setAttribute('contenteditable', 'true');
     }
 
     function updateDropdowns(row) {
