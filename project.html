@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clue Matrix</title>
+
+  <style>
+    .crossed-out {
+      text-decoration: line-through;
+    }
+
+    .crossed-row {
+      background-color: lightcoral;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Update the loop to cover all rows, not just up to 13
+      for (var i = 2; i <= 24; i++) {
+        var cellId = 'cell_1_' + i;
+        var cell = document.getElementById(cellId);
+
+        cell.addEventListener('contextmenu', function (event) {
+          event.preventDefault();
+
+          // Toggle 'crossed-out' class on the clicked cell
+          this.classList.toggle('crossed-out');
+
+          // Get the row ID and toggle 'crossed-row' class for the entire row
+          var rowId = this.id.split('_')[2];
+          var row = document.getElementById('row_' + rowId);
+          row.classList.toggle('crossed-row');
+
+          // Update drop-down menus in the row to have the default value "X" if the row is crossed out
+          updateDropdowns(row);
+        });
+      }
+    });
+
+    function updateDropdowns(row) {
+      var selects = row.querySelectorAll('select');
+      for (var i = 0; i < selects.length; i++) {
+        if (selects[i].value === '') {
+          selects[i].value = row.classList.contains('crossed-row') ? 'X' : '';
+        } else if (selects[i].value === '1') {
+          selects[i].value = '1X';
+        } else if (selects[i].value === '2') {
+          selects[i].value = '2X';
+        } else if (selects[i].value === '3') {
+          selects[i].value = '3X';
+        } else if (selects[i].value === '4') {
+          selects[i].value = '4X';
+        } else if (selects[i].value === '5') {
+          selects[i].value = '5X';
+        }
+
+      }
+    }
+
+    function getCharacterName(row) {
+      var characters = ["<strong>Suspects</strong>", "Mustard", "Scarlett", "Plum", "Green", "White", "Peacock", "<strong>Weapons</strong>", "Candle Stick", "Lead Pipe", "Revolver", "Wrench", "Rope", "Dagger", "<strong>Room</strong>", "Hall", "Lounge", "Dining Room", "Kitchen", "Ballroom", "Conservatory", "Billiard Room", "Library", "Study"];
+      return characters[row - 1];
+    }
+
+    function getOptions(row) {
+      var options = ["", "1", "2", "3", "4", "5", "1X", "2X", "3X", "4X", "5X", "&#x2713;", "X"];
+      return options.map(option => `<option value="${option}">${option}</option>`).join('');
+    }
+  </script>
+</head>
+
+<body>
+
+  <table border="0">
+    <tr>
+      <td id="cell_1_1" contenteditable="false"><strong>Suspects</strong></td>
+      <td id="cell_2_1" contenteditable="true"></td>
+      <td id="cell_3_1" contenteditable="true"></td>
+      <td id="cell_4_1" contenteditable="true"></td>
+      <td id="cell_5_1" contenteditable="true"></td>
+      <td id="cell_6_1" contenteditable="true"></td>
+      <td id="cell_7_1" contenteditable="true"></td>
+    </tr>
+    <script>
+      var num_rows = 24;
+      var num_columns = 7;
+
+      for (var row = 2; row <= num_rows; row++) {
+        document.write('<tr id="row_' + row + '">');
+
+        // Inner loop for columns
+        for (var col = 1; col <= num_columns; col++) {
+          var cell_id = 'cell_' + col + '_' + row;
+          var content_editable = col === 1 ? 'true' : 'false';
+
+          document.write(`
+            <td id="${cell_id}" contenteditable="${content_editable}">
+              ${col === 1 ? getCharacterName(row) : (row === 1 || row === 8 || row === 15  ?"" : '<select>' + getOptions() + '</select>')}
+            </td>
+          `);
+        }
+
+        document.write('</tr>');
+      }
+    </script>
+
+  </table>
+
+</body>
+
+</html>
